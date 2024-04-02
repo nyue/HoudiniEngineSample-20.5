@@ -30,7 +30,7 @@
 #include <string>
 
 #define DEFAULT_NAMED_PIPE "hapi"
-#define DEFAULT_HOST_NAME "localhost"
+#define DEFAULT_HOST_NAME "127.0.0.1"
 #define DEFAULT_TCP_PORT 9090
 
 class HoudiniEngineManager
