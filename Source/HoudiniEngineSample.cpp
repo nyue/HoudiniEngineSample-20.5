@@ -108,8 +108,7 @@ main(int argc, char ** argv)
     }
 
     if (!he_manager->startSession(
-        (HoudiniEngineManager::SessionType)session_type, use_cooking_thread, 
-        named_pipe, tcp_port))
+        (HoudiniEngineManager::SessionType)session_type, named_pipe, tcp_port))
     {
         std::cerr << "Failed to create a Houdini Engine session." << std::endl;
         return 1;

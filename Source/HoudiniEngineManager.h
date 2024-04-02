@@ -49,7 +49,6 @@ public:
 
 	// Creates a new session
 	bool startSession(SessionType session_type,
-                      bool use_cooking_thread,
                       const std::string& named_pipe,
                       int tcp_port);
 	

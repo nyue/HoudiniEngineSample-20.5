@@ -37,7 +37,6 @@ HoudiniEngineManager::HoudiniEngineManager() : mySession{}, myCookOptions{}
 
 bool 
 HoudiniEngineManager::startSession(SessionType session_type,
-                                   bool use_cooking_thread,
                                    const std::string& named_pipe,
                                    int tcp_port)
 {
@@ -143,15 +142,13 @@ HoudiniEngineManager::stopSession()
 bool
 HoudiniEngineManager::restartSession(SessionType session_type, bool use_cooking_thread)
 {
-    HAPI_Session* SessionPtr = &mySession;
-
     std::cout << "Restarting the Houdini Engine session...\n";
 
     // Make sure we stop the current session if it is still valid
     bool bSuccess = false;
     stopSession();
 
-    if (!startSession(session_type, use_cooking_thread, myNamedPipe, myTcpPort))
+    if (!startSession(session_type, myNamedPipe, myTcpPort))
     {
         std::cout << "Failed to restart the Houdini Engine session - Failed to start the new Session" << std::endl;
     }
