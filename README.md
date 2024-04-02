@@ -57,7 +57,23 @@ This will place an executable named `HoudiniEngineSample.exe` in the project's `
 
 ### Version Compatibility
 
-The HoudiniEngineSample application is compatible with HAPI version 6.0. For more details please see: https://www.sidefx.com/docs/hengine/_h_a_p_i__migration.html
+The HoudiniEngineSample application is compatible with HAPI version 6.2. For more details please see: https://www.sidefx.com/docs/hengine/_h_a_p_i__migration.html
+
+### HoudiniEngineSample for Python
+
+In `/Python` you can find the sample application implemented using the `hapi` package, the Python wrapping of the Houdini Engine C API. Launch it using Hython, the Python shell that ships with Houdini.
+
+1. Initialize your environment following the steps in *Building the Sample*.
+
+2. In the same terminal session, navigate to a directory with write permissions and fetch a copy of the HoudiniEngineSample project:
+```
+git clone https://github.com/sideeffects/HoudiniEngineSample.git
+
+cd HoudiniEngineSample/Python
+hython he_sample.py
+```
+
+See https://www.sidefx.com/docs/houdini/hapi/ for documentation and getting started resources. 
 
 ### More Resources
 
