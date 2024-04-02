@@ -45,6 +45,8 @@ printCommandMenu()
     std::cout << "Working with Geometry" << std::endl;
     std::cout << "  - setgeo: Marshal mesh data to Houdini" << std::endl;
     std::cout << "  - getgeo: Read mesh data from Houdini" << std::endl;
+    std::cout << "Working with Sessions" << std::endl;
+    std::cout << "  - checkvalid: Check if the session is valid" << std::endl;
     std::cout << "General Commands" << std::endl;
     std::cout << "  - help: Print menu of commands"  << std::endl;
     std::cout << "  - save: Save the Houdini session to a hip file" << std::endl;
@@ -182,6 +184,31 @@ main(int argc, char ** argv)
             else
                 std::cerr << "\nMesh data must be set and sent to Houdini to "
                              "cook before it can be queried (cmd setgeo)." << std::endl;
+        }
+        else if (user_cmd == "checkvalid")
+        {
+            HAPI_Session* session = he_manager->getSession();
+            
+            if (!session)
+            {
+                std::cerr << "No session exists." << std::endl;
+            }
+
+            HAPI_Result result = HoudiniApi::IsSessionValid(session);
+
+            if (result == HAPI_RESULT_SUCCESS)
+            {
+                std::cout << "The session is VALID." << std::endl;
+            }
+            else if (result == HAPI_RESULT_INVALID_SESSION)
+            {
+                std::cout << "The session is INVALID." << std::endl;
+            }
+            else
+            {
+                std::cerr << "Invalid result when checking session validity. "
+                    << "Something went wrong." << std::endl;
+            }
         }
         else if(user_cmd == "help")
         {
