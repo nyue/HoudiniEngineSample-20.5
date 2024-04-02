@@ -26,7 +26,7 @@
 
 #include "HoudiniEnginePlatform.h"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
     #include "Windows.h"
 #else
     #include <dlfcn.h>
@@ -45,7 +45,7 @@ HoudiniEnginePlatform::LoadLibHAPIL()
 {
     void* libHAPIL = nullptr;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
     // Look up the HFS environment variable
     char *buf;
     size_t len;
@@ -81,7 +81,7 @@ HoudiniEnginePlatform::LoadLibHAPIL()
 bool
 HoudiniEnginePlatform::FreeLibHAPIL(void* libHAPIL)
 {
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
     return FreeLibrary((HMODULE)libHAPIL) && SetDllDirectory(nullptr);
 #else
     return dlclose(libHAPIL) == 0;
@@ -91,7 +91,7 @@ HoudiniEnginePlatform::FreeLibHAPIL(void* libHAPIL)
 void*
 HoudiniEnginePlatform::GetDllExport(void* LibraryHandle, const char* ExportName)
 {
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
     return GetProcAddress((HMODULE)LibraryHandle, ExportName);
 #else
     return dlsym(LibraryHandle, ExportName);
