@@ -32,7 +32,7 @@ class HoudiniEngineGeometry(object):
         '''Marshal a mesh (with position, colour, normal and uv data) to Houdini as input'''
 
         print("\nCreating geometry input node 'input_Cube'...")
-        input_cube = hapi.createInputNode(session, "Cube")
+        input_cube = hapi.createInputNode(session, -1, "Cube")
 
         # Use the Geometry Setters API to define a cube mesh
         node_part = hapi.PartInfo()

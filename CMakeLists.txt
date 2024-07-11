@@ -47,13 +47,25 @@ if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
 elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" )
     set( HOUDINI_HAPI_HEADERS "$ENV{HFS}/toolkit/include/" )
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17" )
-   
+
+    # Choose the library path to use for rpath.
+    # SideFX developer environments (internal) have a different library path
+    # than end-user environments.  If the developer library path exists,
+    # then use it.  Otherwise, use the end-user library path.
+    if ( EXISTS $ENV{HFS}/dsolib )
+	# SideFX developer environment library path.
+	set( macos_rpath "$ENV{HFS}/dsolib/" )
+    else ()
+	# End-user environment library path.
+	set( macos_rpath "$ENV{HFS}/../Libraries/" )
+    endif ()
+
      # Setup rpath to locate libHAPIL.dylib at runtime
      set_target_properties(
         ${PROJECT_NAME}
         PROPERTIES
         MACOSX_RPATH TRUE
-        INSTALL_RPATH "$ENV{HFS}/../Libraries/"
+        INSTALL_RPATH "${macos_rpath}"
     )
     target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} )
 

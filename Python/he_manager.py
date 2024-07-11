@@ -34,6 +34,7 @@ class SessionType(Enum):
     NewTCPSocket = 3
     ExistingNamedPipe = 4
     ExistingTCPSocket = 5
+    ExistingSharedMemory = 6
 
 
 class HoudiniEngineManager(object):
@@ -48,7 +49,7 @@ class HoudiniEngineManager(object):
         self.named_pipe = self.DEFAULT_NAMED_PIPE
         self.tcp_port = self.DEFAULT_TCP_PORT
 
-    def startSession(self, session_type, named_pipe, tcp_port, log_file="./he_log.txt"):
+    def startSession(self, session_type, named_pipe, tcp_port, shared_mem_name="", log_file="./he_log.txt"):
         ''' Creates a new session'''
         # Only start a new Session if we dont already have a valid one
         if self.session and hapi.isSessionValid(self.session):
@@ -69,7 +70,8 @@ class HoudiniEngineManager(object):
         if session_type == SessionType.InProcess.value:
             # In-Process HAPI
             print("Creating a HAPI in-process session...")
-            self.session = hapi.createInProcessSession()
+            session_info = hapi.SessionInfo()
+            self.session = hapi.createInProcessSession(session_info)
         elif session_type == SessionType.NewNamedPipe.value:
             # Start our named-pipe server
             print("Starting a named-pipe server...")
@@ -78,7 +80,9 @@ class HoudiniEngineManager(object):
 
             # Connect to the newly started server
             print("Connecting to the named-pipe session...")
-            self.session = hapi.createThriftNamedPipeSession(named_pipe)
+            session_info = hapi.SessionInfo()
+            self.session = hapi.createThriftNamedPipeSession(
+                named_pipe, session_info)
         elif session_type == SessionType.NewTCPSocket.value:
             # Start our socket server
             print("Starting a TCP socket server...")
@@ -86,17 +90,30 @@ class HoudiniEngineManager(object):
 
             # Connect to the newly started server
             print("Connecting to the TCP socket session...")
+            session_info = hapi.SessionInfo()
             self.session = hapi.createThriftSocketSession(
-                HoudiniEngineManager.DEFAULT_HOST_NAME, tcp_port)
+                HoudiniEngineManager.DEFAULT_HOST_NAME, tcp_port, session_info)
         elif session_type == SessionType.ExistingNamedPipe.value:
             # Existing named-pipe
             print("Connecting to an existing HAPI named pipe session...")
-            self.session = hapi.createThriftNamedPipeSession(named_pipe)
-        else:
+            session_info = hapi.SessionInfo()
+            self.session = hapi.createThriftNamedPipeSession(
+                named_pipe, session_info)
+        elif session_type == SessionType.ExistingTCPSocket.value:
             # Existing socket server
             print("Connecting to an existing HAPI TCP socket session...")
+            session_info = hapi.SessionInfo()
             self.session = hapi.createThriftSocketSession(
-                HoudiniEngineManager.DEFAULT_HOST_NAME, tcp_port)
+                HoudiniEngineManager.DEFAULT_HOST_NAME, tcp_port, session_info)
+        elif session_type == SessionType.ExistingSharedMemory.value:
+            # Shared memory session
+            print("Connecting to an existing HAPI shared memory session...")
+            session_info = hapi.SessionInfo()
+            self.session = hapi.CreateThriftSharedMemorySession(
+                shared_mem_name, session_info)
+        else:
+            print("Cannot connect to unknown session type ({})".format(session_type))
+            return False
 
         if not self.session:
             connectionError = he_utility.getConnectionError()

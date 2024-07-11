@@ -79,7 +79,8 @@ main(int argc, char ** argv)
     std::cout << "  3: TCP Socket Session\n" << std::endl;
     std::cout << "Connect to an existing Houdini Engine Session via SessionSync:" << std::endl;
     std::cout << "  4: Existing Named-Pipe Session" << std::endl;
-    std::cout << "  5: Existing TCP Socket Session\n" << std::endl;
+    std::cout << "  5: Existing TCP Socket Session" << std::endl;
+    std::cout << "  6: Existing Shared Memory Session\n" << std::endl;
     std::cout << ">> ";
     
     int session_type;
@@ -88,6 +89,7 @@ main(int argc, char ** argv)
     bool use_cooking_thread = true; // Enables asynchronous cooking of nodes.
     std::string named_pipe = DEFAULT_NAMED_PIPE;
     int tcp_port = DEFAULT_TCP_PORT;
+    std::string shared_mem_name;
 
     if (session_type == HoudiniEngineManager::SessionType::ExistingNamedPipe)
     {
@@ -101,6 +103,12 @@ main(int argc, char ** argv)
         std::cout << ">> ";
         std::cin >> tcp_port;
     }
+    else if (session_type == HoudiniEngineManager::SessionType::ExistingSharedMemory)
+    {
+        std::cout << "Please specify the shared memory name:" << std::endl;
+        std::cout << ">> ";
+        std::cin >> shared_mem_name;
+    }
 
     HoudiniEngineManager* he_manager = new HoudiniEngineManager();
     if (!he_manager)
@@ -110,7 +118,7 @@ main(int argc, char ** argv)
     }
 
     if (!he_manager->startSession(
-        (HoudiniEngineManager::SessionType)session_type, named_pipe, tcp_port))
+        (HoudiniEngineManager::SessionType)session_type, named_pipe, tcp_port, shared_mem_name))
     {
         std::cerr << "Failed to create a Houdini Engine session." << std::endl;
         return 1;
@@ -129,7 +137,7 @@ main(int argc, char ** argv)
     std::string asset_name;
     if (!he_manager->loadAsset(otl_path.c_str(), asset_id, asset_name))
     {
-        std::cerr << "Failed to load the default HDA." << std::endl;
+        std::cerr << "Failed to load the default HDA (" << otl_path << ")." << std::endl;
         return 1;
     }
 

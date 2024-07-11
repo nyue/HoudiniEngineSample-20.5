@@ -42,7 +42,8 @@ public:
 		NewNamedPipe = 2,
 		NewTCPSocket = 3,
 		ExistingNamedPipe = 4,
-		ExistingTCPSocket = 5
+		ExistingTCPSocket = 5,
+		ExistingSharedMemory = 6
 	};
 
 	HoudiniEngineManager();
@@ -50,7 +51,8 @@ public:
 	// Creates a new session
 	bool startSession(SessionType session_type,
                       const std::string& named_pipe,
-                      int tcp_port);
+                      int tcp_port,
+                      const std::string& shard_mem_name);
 	
 	// Stop the existing session if valid, and creates a new session
 	bool restartSession(SessionType session_type, bool use_cooking_thread);
@@ -88,4 +90,5 @@ private:
 	SessionType mySessionType = InProcess;
 	std::string myNamedPipe = DEFAULT_NAMED_PIPE;
 	int myTcpPort = DEFAULT_TCP_PORT;
+        std::string mySharedMemoryName;
 };

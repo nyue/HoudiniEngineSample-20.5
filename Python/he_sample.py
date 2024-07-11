@@ -61,7 +61,8 @@ Start a new Houdini Engine Session via HARS:
     3: TCP Socket Session\n
 Connect to an existing Houdini Engine Session via SessionSync:
     4: Existing Named-Pipe Session
-    5: Existing TCP Socket Session\n"""
+    5: Existing TCP Socket Session
+    6: Existing Shared Memory Session\n"""
     print(init_session_menu)
     session_type = int(input(">> "))
 
@@ -80,6 +81,9 @@ Connect to an existing Houdini Engine Session via SessionSync:
     elif session_type == SessionType.ExistingTCPSocket.value:
         print("Please specify the TCP port:")
         tcp_port = int(input(">> "))
+    elif session_type == SessionType.ExistingSharedMemory.value:
+        print("Please specify the shared memory name:")
+        shared_mem_name = input(">> ")
 
     if not he_manager.startSession(session_type, named_pipe, tcp_port):
         print("ERROR: Failed to create a Houdini Engine session.")

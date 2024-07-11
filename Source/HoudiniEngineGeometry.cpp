@@ -37,7 +37,7 @@ HoudiniEngineGeometry::sendGeometryToHoudini(const HAPI_Session * session, const
     HAPI_NodeId input_cube = -1;
     std::cout << "\nCreating geometry input node 'input_Cube'..." << std::endl;
     HOUDINI_CHECK_ERROR_RETURN(
-        HoudiniApi::CreateInputNode(session, &input_cube, "Cube"), false);
+        HoudiniApi::CreateInputNode(session, -1, &input_cube, "Cube"), false);
 
     HOUDINI_CHECK_ERROR_RETURN(
         HoudiniApi::CookNode(session, input_cube, cook_options), false);

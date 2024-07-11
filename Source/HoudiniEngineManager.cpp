@@ -38,7 +38,8 @@ HoudiniEngineManager::HoudiniEngineManager() : mySession{}, myCookOptions{}
 bool 
 HoudiniEngineManager::startSession(SessionType session_type,
                                    const std::string& named_pipe,
-                                   int tcp_port)
+                                   int tcp_port,
+                                   const std::string& shared_mem_name)
 {
     // Only start a new Session if we dont already have a valid one
     if (HAPI_RESULT_SUCCESS == HoudiniApi::IsSessionValid(&mySession))
@@ -55,6 +56,7 @@ HoudiniEngineManager::startSession(SessionType session_type,
     mySessionType = session_type;
     myNamedPipe = named_pipe;
     myTcpPort = tcp_port;
+    mySharedMemoryName = shared_mem_name;
 
     HAPI_Result SessionResult = HAPI_RESULT_FAILURE;
     if (session_type == SessionType::InProcess)
@@ -62,7 +64,8 @@ HoudiniEngineManager::startSession(SessionType session_type,
         std::cout << "Creating a HAPI in-process session...\n";
 
         // In-Process HAPI
-        SessionResult = HoudiniApi::CreateInProcessSession(&mySession);
+		HAPI_SessionInfo SessionInfo = HoudiniApi::SessionInfo_Create();
+        SessionResult = HoudiniApi::CreateInProcessSession(&mySession, &SessionInfo);
     }
     else if (session_type == SessionType::NewNamedPipe)
     {
@@ -74,8 +77,9 @@ HoudiniEngineManager::startSession(SessionType session_type,
 
         // Connect to the newly started server
         std::cout << "Connecting to the named-pipe session...\n";
+		HAPI_SessionInfo SessionInfo = HoudiniApi::SessionInfo_Create();
         SessionResult = HoudiniApi::CreateThriftNamedPipeSession(
-            &mySession, myNamedPipe.c_str());
+            &mySession, myNamedPipe.c_str(), &SessionInfo);
     }
     else if (session_type == SessionType::NewTCPSocket)
     {
@@ -87,20 +91,36 @@ HoudiniEngineManager::startSession(SessionType session_type,
 
         // Connect to the newly started server
         std::cout << "Connecting to the TCP socket session...\n";
+		HAPI_SessionInfo SessionInfo = HoudiniApi::SessionInfo_Create();
         SessionResult = HoudiniApi::CreateThriftSocketSession(
-            &mySession, DEFAULT_HOST_NAME, myTcpPort);
+            &mySession, DEFAULT_HOST_NAME, myTcpPort, &SessionInfo);
     }
     else if (session_type == SessionType::ExistingNamedPipe)
     {
         std::cout << "Connecting to an existing HAPI named pipe session...\n";
+		HAPI_SessionInfo SessionInfo = HoudiniApi::SessionInfo_Create();
         SessionResult = HoudiniApi::CreateThriftNamedPipeSession(
-            &mySession, myNamedPipe.c_str());
+            &mySession, myNamedPipe.c_str(), &SessionInfo);
+    }
+    else if (session_type == SessionType::ExistingTCPSocket)
+    {
+        std::cout << "Connecting to an existing HAPI TCP socket session...\n";
+		HAPI_SessionInfo SessionInfo = HoudiniApi::SessionInfo_Create();
+        SessionResult = HoudiniApi::CreateThriftSocketSession(
+            &mySession, DEFAULT_HOST_NAME, myTcpPort, &SessionInfo);
+    }
+    else if (session_type == SessionType::ExistingSharedMemory)
+    {
+        std::cout << "Connecting to an existing HAPI shared memory session...\n";
+        HAPI_SessionInfo session_info = HoudiniApi::SessionInfo_Create();
+        SessionResult = HoudiniApi::CreateThriftSharedMemorySession(
+            &mySession, mySharedMemoryName.c_str(), &session_info);
     }
     else
     {
-        std::cout << "Connecting to an existing HAPI TCP socket session...\n";
-        SessionResult = HoudiniApi::CreateThriftSocketSession(
-            &mySession, DEFAULT_HOST_NAME, myTcpPort);
+        std::cerr << "Cannot connect to unknown session type (" << session_type
+            << ")." << std::endl;
+        return false;
     }
 
     if (SessionResult != HAPI_RESULT_SUCCESS)
@@ -148,7 +168,7 @@ HoudiniEngineManager::restartSession(SessionType session_type, bool use_cooking_
     bool bSuccess = false;
     stopSession();
 
-    if (!startSession(session_type, myNamedPipe, myTcpPort))
+    if (!startSession(session_type, myNamedPipe, myTcpPort, mySharedMemoryName))
     {
         std::cout << "Failed to restart the Houdini Engine session - Failed to start the new Session" << std::endl;
     }
