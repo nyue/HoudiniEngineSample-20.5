@@ -81,6 +81,9 @@ public:
 	// Query and list the point, vertex, prim and detail attributes of the given node
 	bool getAttributes(HAPI_NodeId node_id, HAPI_PartId part_id);
 
+	// Query and list the point, vertex, prim and detail attributes of the given node
+	bool exportDelight(HAPI_NodeId node_id, HAPI_PartId part_id);
+
 private:
 	// Wait for a cook to complete while querying its status
 	bool waitForCook();

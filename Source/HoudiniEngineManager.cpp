@@ -31,6 +31,8 @@
 #include <iostream>
 #include <vector>
 
+#include <nsi.hpp>
+
 HoudiniEngineManager::HoudiniEngineManager() : mySession{}, myCookOptions{}
 {
 }
@@ -559,5 +561,151 @@ HoudiniEngineManager::getAttributes(HAPI_NodeId node_id, HAPI_PartId part_id)
         std::cout << "  " << attr_name << std::endl;
     };
 
+    return true;
+}
+
+bool 
+HoudiniEngineManager::exportDelight(HAPI_NodeId node_id, HAPI_PartId part_id)
+{
+    HAPI_PartInfo part_info;
+    HoudiniApi::PartInfo_Init(&part_info);
+    HOUDINI_CHECK_ERROR_RETURN(
+        HoudiniApi::GetPartInfo(getSession(), node_id, part_id, &part_info), false);
+
+    int vertex_attr_count = part_info.attributeCounts[HAPI_ATTROWNER_VERTEX];
+    int point_attr_count = part_info.attributeCounts[HAPI_ATTROWNER_POINT];
+    int prim_attr_count = part_info.attributeCounts[HAPI_ATTROWNER_PRIM];
+    int detail_attr_count = part_info.attributeCounts[HAPI_ATTROWNER_DETAIL];
+
+    std::cout << "\nAttributes: " << std::endl;
+    std::cout << "==========" << std::endl;
+
+    // Point attributes
+    std::vector <HAPI_StringHandle> point_attr_nameSH;
+    point_attr_nameSH.resize(point_attr_count);
+    HOUDINI_CHECK_ERROR_RETURN(
+        HoudiniApi::GetAttributeNames(
+            getSession(), 
+            node_id, part_id, 
+            HAPI_ATTROWNER_POINT, 
+            point_attr_nameSH.data(), 
+            point_attr_count
+        ), false);
+
+    std::cout << "\n  Point Attributes: " << point_attr_count << std::endl;
+    std::cout << "  ----------" << std::endl;
+    for (int i = 0; i < point_attr_count; ++i)
+    {
+        std::string attr_name = HoudiniEngineUtility::getString(getSession(), point_attr_nameSH[i]);
+        std::cout << "  Name: " << attr_name << std::endl;
+        
+        HAPI_AttributeInfo attr_info;
+        HoudiniApi::AttributeInfo_Init(&attr_info);
+        HOUDINI_CHECK_ERROR_RETURN(
+            HoudiniApi::GetAttributeInfo(
+                getSession(), 
+                node_id, part_id, 
+                attr_name.c_str(), 
+                HAPI_ATTROWNER_POINT, 
+                &attr_info
+            ), false);
+
+        std::cout << "  Count: " << attr_info.count << " Storage type: " << attr_info.storage << std::endl;
+    }
+
+    // Vertex attributes
+    std::vector <HAPI_StringHandle> vertex_attr_nameSH;
+    vertex_attr_nameSH.resize(vertex_attr_count);
+    HOUDINI_CHECK_ERROR_RETURN(
+        HoudiniApi::GetAttributeNames(
+            getSession(), 
+            node_id, 
+            part_id, 
+            HAPI_ATTROWNER_VERTEX, 
+            vertex_attr_nameSH.data(), 
+            vertex_attr_count
+        ), false);
+
+    std::cout << "\n  Vertex Attributes: " << vertex_attr_count << std::endl;
+    std::cout << "  ----------" << std::endl;
+    for (int i = 0; i < vertex_attr_count; ++i)
+    {
+        std::string attr_name = HoudiniEngineUtility::getString(getSession(), vertex_attr_nameSH[i]);
+        std::cout << "  Name: " << attr_name << std::endl;
+        
+        HAPI_AttributeInfo attr_info;
+        HoudiniApi::AttributeInfo_Init(&attr_info);
+        HOUDINI_CHECK_ERROR_RETURN(
+            HoudiniApi::GetAttributeInfo(
+                getSession(), 
+                node_id, part_id, 
+                attr_name.c_str(), 
+                HAPI_ATTROWNER_VERTEX, 
+                &attr_info
+            ), false);
+
+        std::cout << "  Count: " << attr_info.count << " Storage type: " << attr_info.storage << std::endl;
+    }
+   
+   // Primitive attributes
+    std::vector <HAPI_StringHandle> prim_attr_nameSH;
+    prim_attr_nameSH.resize(prim_attr_count);
+    HOUDINI_CHECK_ERROR_RETURN(
+        HoudiniApi::GetAttributeNames(
+            getSession(),
+            node_id, part_id, 
+            HAPI_ATTROWNER_PRIM, 
+            prim_attr_nameSH.data(), 
+            prim_attr_count
+        ), false);
+
+    std::cout << "\n  Primitive Attributes: " << prim_attr_count << std::endl;
+    std::cout << "  ----------" << std::endl;
+    for (int i = 0; i < prim_attr_count; ++i)
+    {
+        std::string attr_name = HoudiniEngineUtility::getString(getSession(), prim_attr_nameSH[i]);
+        std::cout << "  Name: " << attr_name << std::endl;
+
+        HAPI_AttributeInfo attr_info;
+        HoudiniApi::AttributeInfo_Init(&attr_info);
+        HOUDINI_CHECK_ERROR_RETURN(
+            HoudiniApi::GetAttributeInfo(
+                getSession(), 
+                node_id, part_id, 
+                attr_name.c_str(), 
+                HAPI_ATTROWNER_PRIM, 
+                &attr_info
+            ), false);
+
+        std::cout << "  Count: " << attr_info.count << " Storage type: " << attr_info.storage << std::endl;
+    }
+
+    // Detail attributes
+    std::vector <HAPI_StringHandle> detail_attr_nameSH;
+    detail_attr_nameSH.resize(detail_attr_count);
+    HOUDINI_CHECK_ERROR_RETURN(
+        HoudiniApi::GetAttributeNames(
+            getSession(),
+            node_id, part_id, 
+            HAPI_ATTROWNER_DETAIL, 
+            detail_attr_nameSH.data(), 
+            detail_attr_count
+        ), false);
+
+    std::cout << "\n  Detail Attributes: " << detail_attr_count << std::endl;
+    std::cout << "  ----------" << std::endl;
+    for (int i = 0; i < detail_attr_count; ++i)
+    {
+        std::string attr_name = HoudiniEngineUtility::getString(getSession(), detail_attr_nameSH[i]);
+        std::cout << "  " << attr_name << std::endl;
+    };
+
+	NSI::Context nsi;
+    NSI::ArgumentList args;
+        args.Add(new NSI::StringArg("type","apistream"));
+        args.Add(new NSI::StringArg("streamfilename","stdout"));
+        nsi.Begin(args);
+    nsi.End();
+	
     return true;
 }

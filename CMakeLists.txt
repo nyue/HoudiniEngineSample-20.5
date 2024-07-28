@@ -2,6 +2,10 @@ cmake_minimum_required( VERSION 3.1 )
 
 project( HoudiniEngineSample )
 
+find_package(DelightNSI REQUIRED)
+include_directories(${DELIGHTNSI_INCLUDE_DIR})
+link_directories(${DELIGHTNSI_LIBRARY_DIR})
+
 IF(NOT DEFINED ENV{HFS})
     message(FATAL_ERROR "The HFS environment variable must be set to your "
                          "Houdini installation directory to build "
@@ -67,7 +71,7 @@ elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" )
         MACOSX_RPATH TRUE
         INSTALL_RPATH "${macos_rpath}"
     )
-    target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} )
+    target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} 3delight)
 
 elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     set( HOUDINI_HAPI_HEADERS "$ENV{HFS}/toolkit/include/" )

@@ -42,6 +42,7 @@ printCommandMenu()
     std::cout << "  - cook: Create & cook the hexagona sample HDA" << std::endl;
     std::cout << "  - parms: Fetch and print node parameters" << std::endl;
     std::cout << "  - attribs: Fetch and print node attributes" << std::endl;
+    std::cout << "  - delight: Fetch and print node attributes" << std::endl;
     std::cout << "Working with Geometry" << std::endl;
     std::cout << "  - setgeo: Marshal mesh data to Houdini" << std::endl;
     std::cout << "  - getgeo: Read mesh data from Houdini" << std::endl;
@@ -172,6 +173,14 @@ main(int argc, char ** argv)
         {
             if (hexagona_cook)
                 he_manager->getAttributes(hexagona_node_id, hexagona_part_id);
+            else
+                std::cerr << "\nThe hexagona sample HDA must be cooked before "
+                             "you can query its attributes (cmd cook)." << std::endl;
+        }
+        else if (user_cmd == "delight")
+        {
+            if (hexagona_cook)
+                he_manager->exportDelight(hexagona_node_id, hexagona_part_id);
             else
                 std::cerr << "\nThe hexagona sample HDA must be cooked before "
                              "you can query its attributes (cmd cook)." << std::endl;
