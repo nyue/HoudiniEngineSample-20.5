@@ -14,12 +14,12 @@ ENDIF()
 
 set( HE_SAMPLE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set( SOURCES
+set( LIB_SOURCES
     ${HE_SAMPLE_ROOT}/Source/HoudiniApi.cpp
     ${HE_SAMPLE_ROOT}/Source/HoudiniEngineGeometry.cpp
     ${HE_SAMPLE_ROOT}/Source/HoudiniEngineManager.cpp
     ${HE_SAMPLE_ROOT}/Source/HoudiniEnginePlatform.cpp
-    ${HE_SAMPLE_ROOT}/Source/HoudiniEngineSample.cpp
+    # ${HE_SAMPLE_ROOT}/Source/HoudiniEngineSample.cpp
     ${HE_SAMPLE_ROOT}/Source/HoudiniEngineUtility.cpp
 )
 
@@ -35,7 +35,15 @@ set( FILES
     ${HE_SAMPLE_ROOT}/HDA/hexagona_lite.hda
 )
 
-add_executable( ${PROJECT_NAME} ${SOURCES} )
+add_library (myhapi SHARED
+  ${LIB_SOURCES})
+
+add_executable( ${PROJECT_NAME}
+  # ${LIB_SOURCES}
+  ${HE_SAMPLE_ROOT}/Source/HoudiniEngineSample.cpp)
+
+target_link_libraries(${PROJECT_NAME}
+  myhapi)
 
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )
     set( HOUDINI_HAPI_HEADERS "$ENV{HFS}/toolkit/include/" )
@@ -71,7 +79,8 @@ elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" )
         MACOSX_RPATH TRUE
         INSTALL_RPATH "${macos_rpath}"
     )
-    target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} 3delight)
+    # target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} 3delight)
+    target_link_libraries( myhapi ${CMAKE_DL_LIBS} 3delight)
 
 elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     set( HOUDINI_HAPI_HEADERS "$ENV{HFS}/toolkit/include/" )
@@ -85,12 +94,13 @@ elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
 endif ()
 
 # Include Houdini Engine headers
-target_include_directories( ${PROJECT_NAME} PUBLIC ${HOUDINI_HAPI_HEADERS} )
+# target_include_directories( ${PROJECT_NAME} PUBLIC ${HOUDINI_HAPI_HEADERS} )
+target_include_directories( myhapi PUBLIC ${HOUDINI_HAPI_HEADERS} )
 
 # Install step
 set( CMAKE_INSTALL_PREFIX "${HE_SAMPLE_ROOT}" )
 
-install( TARGETS ${PROJECT_NAME} DESTINATION "bin" )
+install( TARGETS ${PROJECT_NAME} myhapi DESTINATION "bin" )
 install( FILES ${FILES} DESTINATION "bin/HDA" )
 
 # Set the HDA_INSTALL_PATH constant referenced in main()
