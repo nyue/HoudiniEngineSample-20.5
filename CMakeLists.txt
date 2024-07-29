@@ -35,8 +35,15 @@ set( FILES
     ${HE_SAMPLE_ROOT}/HDA/hexagona_lite.hda
 )
 
-add_library (myhapi SHARED
+add_library (myhapi
   ${LIB_SOURCES})
+
+add_executable(cook_for_delight 
+  ${HE_SAMPLE_ROOT}/Source/cook_delight_main.cpp
+  )
+
+target_link_libraries(cook_for_delight
+  myhapi)
 
 add_executable( ${PROJECT_NAME}
   # ${LIB_SOURCES}
@@ -79,8 +86,16 @@ elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" )
         MACOSX_RPATH TRUE
         INSTALL_RPATH "${macos_rpath}"
     )
+     set_target_properties(
+        cook_for_delight
+        PROPERTIES
+        MACOSX_RPATH TRUE
+        INSTALL_RPATH "${macos_rpath}"
+    )
+
     # target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} 3delight)
     target_link_libraries( myhapi ${CMAKE_DL_LIBS} 3delight)
+    target_link_libraries( cook_for_delight ${CMAKE_DL_LIBS} 3delight)
 
 elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     set( HOUDINI_HAPI_HEADERS "$ENV{HFS}/toolkit/include/" )
@@ -100,7 +115,7 @@ target_include_directories( myhapi PUBLIC ${HOUDINI_HAPI_HEADERS} )
 # Install step
 set( CMAKE_INSTALL_PREFIX "${HE_SAMPLE_ROOT}" )
 
-install( TARGETS ${PROJECT_NAME} myhapi DESTINATION "bin" )
+install( TARGETS ${PROJECT_NAME} cook_for_delight  myhapi DESTINATION "bin" )
 install( FILES ${FILES} DESTINATION "bin/HDA" )
 
 # Set the HDA_INSTALL_PATH constant referenced in main()
