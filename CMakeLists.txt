@@ -45,6 +45,13 @@ add_executable(cook_for_delight
 target_link_libraries(cook_for_delight
   myhapi)
 
+add_library(hda_procedural SHARED
+  ${HE_SAMPLE_ROOT}/Source/hda_procedural.cpp
+  )
+
+target_link_libraries(hda_procedural
+  myhapi)
+
 add_executable( ${PROJECT_NAME}
   # ${LIB_SOURCES}
   ${HE_SAMPLE_ROOT}/Source/HoudiniEngineSample.cpp)
@@ -92,6 +99,13 @@ elseif ( ${CMAKE_SYSTEM_NAME} STREQUAL "Darwin" )
         MACOSX_RPATH TRUE
         INSTALL_RPATH "${macos_rpath}"
     )
+     set_target_properties(
+        hda_procedural
+        PROPERTIES
+		PREFIX ""
+        MACOSX_RPATH TRUE
+        INSTALL_RPATH "${macos_rpath}"
+    )
 
     # target_link_libraries( ${PROJECT_NAME} ${CMAKE_DL_LIBS} 3delight)
     target_link_libraries( myhapi ${CMAKE_DL_LIBS} 3delight)
@@ -115,7 +129,7 @@ target_include_directories( myhapi PUBLIC ${HOUDINI_HAPI_HEADERS} )
 # Install step
 set( CMAKE_INSTALL_PREFIX "${HE_SAMPLE_ROOT}" )
 
-install( TARGETS ${PROJECT_NAME} cook_for_delight  myhapi DESTINATION "bin" )
+install( TARGETS ${PROJECT_NAME} cook_for_delight  myhapi hda_procedural DESTINATION "bin" )
 install( FILES ${FILES} DESTINATION "bin/HDA" )
 
 # Set the HDA_INSTALL_PATH constant referenced in main()
