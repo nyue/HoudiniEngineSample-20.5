@@ -52,6 +52,14 @@ add_library(hda_procedural SHARED
 target_link_libraries(hda_procedural
   myhapi)
 
+add_executable(3dl_procedural_tester
+  Source/hda_procedural_main.cpp
+  )
+
+target_link_libraries(3dl_procedural_tester
+  ${DELIGHTNSI_3delight_LIBRARY}
+  )
+
 add_executable( ${PROJECT_NAME}
   # ${LIB_SOURCES}
   ${HE_SAMPLE_ROOT}/Source/HoudiniEngineSample.cpp)
@@ -129,7 +137,7 @@ target_include_directories( myhapi PUBLIC ${HOUDINI_HAPI_HEADERS} )
 # Install step
 set( CMAKE_INSTALL_PREFIX "${HE_SAMPLE_ROOT}" )
 
-install( TARGETS ${PROJECT_NAME} cook_for_delight  myhapi hda_procedural DESTINATION "bin" )
+install( TARGETS ${PROJECT_NAME} cook_for_delight  myhapi hda_procedural 3dl_procedural_tester DESTINATION "bin" )
 install( FILES ${FILES} DESTINATION "bin/HDA" )
 
 # Set the HDA_INSTALL_PATH constant referenced in main()
